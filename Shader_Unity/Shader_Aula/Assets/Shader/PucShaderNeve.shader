@@ -20,8 +20,6 @@ Shader "Unlit/PucShaderNeve"
                     #include  "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
                     #include  "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
- 
-
                 float _WindSelect;
                 float _WindForce;
                 float _LeafSelect;
@@ -29,8 +27,6 @@ Shader "Unlit/PucShaderNeve"
                 SamplerState sampler_MainTex;
                 texture2D _OldTex;
                 SamplerState sampler_OldTex;
-
- 
 
 
                 struct Attributes
@@ -40,52 +36,40 @@ Shader "Unlit/PucShaderNeve"
                     half3 normal : NORMAL;
                     half4 color : COLOR;
                 };
-            
-                struct Varyings 
+           
+                struct Varyings
                 {
                     float4 positionVAR :SV_POSITION;
                     half2 uvVAR       : TEXCOORD0;
                     half4 color : COLOR0;
-                    
+                   
                     half3 normalVAR : NORMAL;
                 };
-
- 
 
                 Varyings vert(Attributes Input)
                 {
                     Varyings Output;
                     float3 position = Input.position.xyz;
 
- 
-
                     if (Input.color.y > _WindSelect) {
                         position = Input.position.xyz + Input.normal * (-_WindForce + cos(_Time.w + Input.position.y * 100) * _WindForce);
                     }
 
- 
-
                     Output.positionVAR = TransformObjectToHClip(position);
-
- 
 
                     Output.uvVAR = Input.uv;
                    
                     Output.normalVAR = Input.normal;
                     Output.color = Input.color;
-                    
-
- 
+                   
 
                     return Output;
                 }
                 half4 frag(Varyings Input) :SV_TARGET
-                { 
+                {
                     half4 color = Input.color;
                     color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
                     float snowforce = dot(TransformObjectToWorldNormal(Input.normalVAR), float3(0, 1, 0));
-
- 
 
                    
                     if (snowforce >0) {
@@ -94,18 +78,12 @@ Shader "Unlit/PucShaderNeve"
                     }
                    Light l = GetMainLight();
 
- 
-
                    float intensity = dot(l.direction, TransformObjectToWorldNormal(Input.normalVAR));
-
- 
 
                     return color* intensity;
                 }
 
- 
 
- 
 
             ENDHLSL
         }
