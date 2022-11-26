@@ -1,4 +1,4 @@
-Shader "Custom/sh_BurningTreeText"
+Shader "Custom/Arvore_Q"
 {
     Properties
     {
@@ -9,7 +9,7 @@ Shader "Custom/sh_BurningTreeText"
         
         _BurningStart("BurningStartPos", float) = 0
         _BurningSlow("BurningSlowdown", float) = 1
-        _BurningTex("Texture", 2D) = "white" {}
+        _BurningColorMult("BurningColorMultiplier", float) = 0.5
     }
         SubShader
         {
@@ -33,8 +33,7 @@ Shader "Custom/sh_BurningTreeText"
 
                 float _BurningStart;
                 float _BurningSlow;
-                texture2D _BurningTex;
-                SamplerState sampler_BurningTex;
+                float _BurningColorMult;
 
                 struct Attributes
                 {
@@ -91,21 +90,19 @@ Shader "Custom/sh_BurningTreeText"
                                              viewDirection)), _SpecForce);
                     }
 
-                    color *= clamp(0, 1, intensity);
                     if(Input.locpositionVAR.y + _BurningStart < (_Time.y / _BurningSlow))
                     {
-                        color *= _BurningTex.Sample(sampler_BurningTex, Input.uvVAR);
-                    }
-                    else
-                    {
-                        color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
+                        color *= _BurningColorMult;
                     }
                     /*
                     //mudança gradual, ao invés de cima para baixo
                     float step = _Time.y / _BurningSlow;
                     if(step > 1) step = 1;
-                    color = lerp(_MainTex.Sample(sampler_MainTex, Input.uvVAR), _BurningTex.Sample(sampler_BurningTex, Input.uvVAR), step);
+                    color = lerp(color, color *= _BurningColorMult, step);
                     */
+
+                    color *= clamp(0, 1, intensity);
+                    color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
                     color += float4(specularReflection, 0) * 0.05;
                     return color;
                 }

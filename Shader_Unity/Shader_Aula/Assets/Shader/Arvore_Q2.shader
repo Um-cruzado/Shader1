@@ -1,4 +1,4 @@
-Shader "Custom/sh_BurningTree"
+Shader "Custom/Arvore_Q2"
 {
     Properties
     {
@@ -9,7 +9,7 @@ Shader "Custom/sh_BurningTree"
         
         _BurningStart("BurningStartPos", float) = 0
         _BurningSlow("BurningSlowdown", float) = 1
-        _BurningColorMult("BurningColorMultiplier", float) = 0.5
+        _BurningTex("Texture", 2D) = "white" {}
     }
         SubShader
         {
@@ -33,7 +33,8 @@ Shader "Custom/sh_BurningTree"
 
                 float _BurningStart;
                 float _BurningSlow;
-                float _BurningColorMult;
+                texture2D _BurningTex;
+                SamplerState sampler_BurningTex;
 
                 struct Attributes
                 {
@@ -90,19 +91,21 @@ Shader "Custom/sh_BurningTree"
                                              viewDirection)), _SpecForce);
                     }
 
+                    color *= clamp(0, 1, intensity);
                     if(Input.locpositionVAR.y + _BurningStart < (_Time.y / _BurningSlow))
                     {
-                        color *= _BurningColorMult;
+                        color *= _BurningTex.Sample(sampler_BurningTex, Input.uvVAR);
+                    }
+                    else
+                    {
+                        color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
                     }
                     /*
                     //mudança gradual, ao invés de cima para baixo
                     float step = _Time.y / _BurningSlow;
                     if(step > 1) step = 1;
-                    color = lerp(color, color *= _BurningColorMult, step);
+                    color = lerp(_MainTex.Sample(sampler_MainTex, Input.uvVAR), _BurningTex.Sample(sampler_BurningTex, Input.uvVAR), step);
                     */
-
-                    color *= clamp(0, 1, intensity);
-                    color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
                     color += float4(specularReflection, 0) * 0.05;
                     return color;
                 }
