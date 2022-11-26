@@ -100,12 +100,12 @@ Shader "Custom/Arvore_Q2"
                     {
                         color *= _MainTex.Sample(sampler_MainTex, Input.uvVAR);
                     }
-                    /*
-                    //mudança gradual, ao invés de cima para baixo
+                    
+                
                     float step = _Time.y / _BurningSlow;
                     if(step > 1) step = 1;
                     color = lerp(_MainTex.Sample(sampler_MainTex, Input.uvVAR), _BurningTex.Sample(sampler_BurningTex, Input.uvVAR), step);
-                    */
+                    
                     color += float4(specularReflection, 0) * 0.05;
                     return color;
                 }
